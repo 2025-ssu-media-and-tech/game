@@ -1,0 +1,20 @@
+{
+  "private": false,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "p5": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@types/p5": "^1.7.6",
+    "prettier": "^3.6.2",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  }
+}

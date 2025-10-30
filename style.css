@@ -1,0 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*
+  Browser의 Full width, Full Height.
+  전체화면으로 게임을 실행한다는 전제조건.
+*/
+body {
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
