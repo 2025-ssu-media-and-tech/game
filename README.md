@@ -20,6 +20,32 @@ $ bun install
 $ bun dev
 ```
 
+## 개발
+`src/` 하위에서 모든 코드를 관리합니다. <br />
+자유롭게 Directory(Folder)등을 생성하여 개발하시면 됩니다. <br />
+Application의 Entry point는 `src/main.ts` 입니다.
+```ts
+import p5 from 'p5';
+
+const main = (p5: p5) => {
+  p5.setup = () => {
+    const { windowWidth, windowHeight } = p5;
+
+    const canvas = p5.createCanvas(windowWidth, windowHeight);
+    canvas.parent('app');
+  };
+  p5.draw = () => {
+      // 여기에 코드 작성
+      /* 예시
+       * p5.rectMode(p5.CORNER);
+       * p5.rect();
+       */
+  };
+};
+
+new p5(main);
+```
+
 ## 코드 관리
 ### Git-flow
 [Git-flow](https://techblog.woowahan.com/2553) 기법으로 코드를 관리합니다. <br />
