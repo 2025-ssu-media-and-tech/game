@@ -1,4 +1,5 @@
 import p5 from 'p5';
+import { CURRENT_SCENE, changeCurrentScene } from './lib/scene';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -7,7 +8,42 @@ const main = (p5: p5) => {
     const canvas = p5.createCanvas(windowWidth, windowHeight);
     canvas.parent('app');
   };
-  p5.draw = () => {};
+  p5.draw = () => {
+    // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
+    switch (CURRENT_SCENE) {
+      case 'INTRO':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'START':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'READY':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'GAME':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'SCORE':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'END':
+        console.log(CURRENT_SCENE);
+        break;
+      case 'OUTRO':
+        console.log(CURRENT_SCENE);
+        break;
+      default:
+        // no-op, 여기까지 코드가 도달할 일은 없습니다.
+        console.log('잘못 된 Scene 값입니다.');
+        return;
+    }
+
+    // changeCurrentScene 예시.
+    // changeCurrentScene('READY', () => {
+    //   console.log('다음의 값으로 변경됨.', CURRENT_SCENE);
+    //   // 변경된 씬의 필요한 데이터(이미지, 오디오 등...) 로드.
+    // });
+  };
 };
 
 new p5(main);
