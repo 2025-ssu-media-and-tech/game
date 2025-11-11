@@ -1,13 +1,6 @@
 import type p5 from 'p5';
-import type { Direction } from '../../types/direction';
-
-/**
- * 뱀 위치 정보 (x, y 좌표만)
- */
-export interface SnakePosition {
-  x: number;
-  y: number;
-}
+import type { Direction } from '@/types/direction';
+import type { SnakePosition } from '@/types/snake';
 
 /**
  * 뱀 색상
