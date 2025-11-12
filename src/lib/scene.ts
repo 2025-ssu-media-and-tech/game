@@ -1,4 +1,4 @@
-import type { SceneType } from '../types/status';
+import type { SceneType } from '@/types/status';
 
 export let CURRENT_SCENE: SceneType = 'INTRO';
 

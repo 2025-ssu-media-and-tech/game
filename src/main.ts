@@ -1,5 +1,5 @@
 import p5 from 'p5';
-import { CURRENT_SCENE, changeCurrentScene } from './lib/scene';
+import { CURRENT_SCENE } from '@/lib/scene';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -9,6 +9,28 @@ const main = (p5: p5) => {
     canvas.parent('app');
   };
   p5.draw = () => {
+    /*
+    뱀 렌더러 예시입니다.
+    const cellSize = 30;
+    const gridX = Math.floor(p5.width / 2 / cellSize);
+    const gridY = Math.floor(p5.height / 2 / cellSize);
+    */
+
+    /*
+    뱀 위치 (머리부터 꼬리까지)
+    const snakePositions: SnakePosition[] = [
+      { x: gridX * cellSize, y: gridY * cellSize },
+      { x: (gridX - 1) * cellSize, y: gridY * cellSize },
+      { x: (gridX - 2) * cellSize, y: gridY * cellSize },
+      { x: (gridX - 3) * cellSize, y: gridY * cellSize },
+    ];
+    */
+
+    /* 
+    뱀 그리기
+    drawSnake(p5, snakePositions, cellSize);
+    */
+
     // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
     switch (CURRENT_SCENE) {
       case 'INTRO':
