@@ -1,5 +1,7 @@
 import p5 from 'p5';
-import { CURRENT_SCENE } from '@/lib/scene';
+import { CURRENT_SCENE } from '@/utils/scene';
+import { drawIntro } from '@/scenes/intro';
+import { drawOutro } from '@/scenes/outro';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -34,7 +36,7 @@ const main = (p5: p5) => {
     // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
     switch (CURRENT_SCENE) {
       case 'INTRO':
-        console.log(CURRENT_SCENE);
+        drawIntro(p5);
         break;
       case 'START':
         console.log(CURRENT_SCENE);
@@ -52,7 +54,7 @@ const main = (p5: p5) => {
         console.log(CURRENT_SCENE);
         break;
       case 'OUTRO':
-        console.log(CURRENT_SCENE);
+        drawOutro(p5);
         break;
       default:
         // no-op, 여기까지 코드가 도달할 일은 없습니다.
