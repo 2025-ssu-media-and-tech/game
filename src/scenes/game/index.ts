@@ -1,9 +1,11 @@
 import type p5 from 'p5';
-import { CURRENT_SCENE } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { drawSnake } from '@/core/snake/snake-renderer';
 import type { SnakePosition } from '@/types/snake';
 import type { Direction } from '@/types/direction';
+import { setHighScore } from '@/utils/storage';
+import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
 
 const sceneName: SceneType = 'GAME';
 
@@ -19,6 +21,9 @@ let lastMoveTime = 0;
 let isGameOver = false;
 let score = 0;
 
+// 버튼
+let gameOverButtons: Button[] = [];
+
 // 현재 화면 사이즈를 기준으로 Grid 계산하여 반환
 const getGridSize = (p: p5) => ({
   cols: Math.floor(p.width / CELL_SIZE),
@@ -26,8 +31,6 @@ const getGridSize = (p: p5) => ({
 });
 
 // 열매(점수 획득 요소) 스폰 기능
-// Grid에서 랜덤으로 한 개의 Cell을 찾아서 열매 스폰
-// 조건: !SnakeCell
 const spawnFood = (p: p5) => {
   const { cols, rows } = getGridSize(p);
   let valid = false;
@@ -73,6 +76,31 @@ const initGame = (p: p5) => {
   isGameOver = false;
   spawnFood(p);
   lastMoveTime = p.millis();
+};
+
+// 게임오버 UI
+const initGameOverUI = (p: p5) => {
+  const centerX = p.width / 2;
+  const centerY = p.height / 2;
+
+  gameOverButtons = [
+    {
+      id: 'restart',
+      x: centerX - 110,
+      y: centerY + 100,
+      width: 200,
+      height: 50,
+      text: '다시 시작',
+    },
+    {
+      id: 'goto-score',
+      x: centerX + 110,
+      y: centerY + 100,
+      width: 200,
+      height: 50,
+      text: '점수 보기',
+    },
+  ];
 };
 
 export const drawGame = (p: p5) => {
@@ -127,7 +155,10 @@ export const drawGame = (p: p5) => {
       const { cols, rows } = getGridSize(p);
       if (newHead.x < 0 || newHead.x >= cols || newHead.y < 0 || newHead.y >= rows) {
         isGameOver = true;
+        setHighScore(score); // 점수 저장
+        initGameOverUI(p); // 게임오버 UI 렌더링
       } else {
+        // 벽이 아닌 충돌을 감지했는데, 열매를 먹고있는 중 일수도 있으니 이를 판단하는 코드
         const isEating = food && newHead.x === food.x && newHead.y === food.y;
 
         // 충돌 감지 (몸)
@@ -136,6 +167,8 @@ export const drawGame = (p: p5) => {
 
         if (isSelfCollision) {
           isGameOver = true;
+          setHighScore(score); // 점수 저장
+          initGameOverUI(p); // 게임오버 UI 렌더링
         } else {
           // 뱀 움직이기
           snake.unshift(newHead); // 머리 생성
@@ -152,7 +185,7 @@ export const drawGame = (p: p5) => {
       lastMoveTime = currentTime;
     }
   } else {
-    // 재시작
+    // 재시작 (Enter 키 지원 유지)
     if (p.keyIsDown(p.ENTER)) {
       initGame(p);
     }
@@ -196,14 +229,15 @@ export const drawGame = (p: p5) => {
     p.textAlign(p.CENTER, p.CENTER);
 
     p.textSize(60);
-    p.text('GAME OVER', p.width / 2, p.height / 2 - 40);
+    p.text('GAME OVER', p.width / 2, p.height / 2 - 50);
 
     p.textSize(30);
-    p.text(`Final Score: ${score}`, p.width / 2, p.height / 2 + 20);
+    p.text(`Final Score: ${score}`, p.width / 2, p.height / 2 + 10);
 
-    p.textSize(20);
-    p.fill(200);
-    p.text('Press ENTER to Restart', p.width / 2, p.height / 2 + 70);
+    // Buttons
+    if (gameOverButtons.length === 0) initGameOverUI(p); // Safety
+    gameOverButtons.forEach((btn) => drawButton(p, btn));
+
     p.pop();
   }
 
@@ -217,4 +251,18 @@ export const drawGame = (p: p5) => {
   p.pop();
 
   p.pop();
+};
+
+export const handleGameClick = (p: p5) => {
+  if (CURRENT_SCENE !== sceneName || !isGameOver) return;
+
+  gameOverButtons.forEach((btn) => {
+    if (isMouseOverButton(p, btn)) {
+      if (btn.id === 'restart') {
+        initGame(p);
+      } else if (btn.id === 'goto-score') {
+        changeCurrentScene('SCORE');
+      }
+    }
+  });
 };
