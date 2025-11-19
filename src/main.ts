@@ -2,6 +2,7 @@ import p5 from 'p5';
 import { CURRENT_SCENE } from '@/utils/scene';
 import { drawIntro } from '@/scenes/intro';
 import { drawOutro } from '@/scenes/outro';
+import { drawStart, handleStartClick } from './scenes/start';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -9,6 +10,9 @@ const main = (p5: p5) => {
 
     const canvas = p5.createCanvas(windowWidth, windowHeight);
     canvas.parent('app');
+
+    // 디버깅용 - START 씬으로 전환, 주석 해제하면 START 씬으로 전환
+    // changeCurrentScene('START');
   };
   p5.draw = () => {
     /*
@@ -39,7 +43,10 @@ const main = (p5: p5) => {
         drawIntro(p5);
         break;
       case 'START':
-        console.log(CURRENT_SCENE);
+        p5.mousePressed = () => {
+          handleStartClick(p5);
+        };
+        drawStart(p5);
         break;
       case 'READY':
         console.log(CURRENT_SCENE);
