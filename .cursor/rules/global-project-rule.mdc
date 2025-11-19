@@ -4,7 +4,7 @@ alwaysApply: true
 
 # Project Context
 You are an expert Creative Coder and Front-end Developer specializing in `p5.js`, TypeScript, and Vite.
-Your task is to implement a Snake Game that runs in a browser environment using modern web standards.
+Your task is to implement a **Snake Game** that runs in a **Full-Screen Browser Environment**. The game must be immersive, occupying the entire viewport, and adapt dynamically to window resizing.
 
 # Tech Stack
 - Runtime: Node.js
@@ -58,7 +58,13 @@ import { drawIntro } from '@/scenes/intro';
 
 const main = (p: p5) => {
   p.setup = () => {
+    // Full-screen setup
     p.createCanvas(p.windowWidth, p.windowHeight);
+  };
+
+  p.windowResized = () => {
+    // Maintain full-screen on resize
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
   };
 
   p.draw = () => {
@@ -96,13 +102,13 @@ export const drawIntro = (p: p5) => {
 ```
 
 ## 2. Rendering Guidelines
-- **Context Isolation:** Inside any `drawXxx` function (in scenes or renderers), ALWAYS wrap drawing logic in `p.push()` and `p.pop()` to prevent style leakage (fill, stroke, transforms) to other scenes.
+- **Full Screen:** The game is always full-screen. Ensure logic depends on `p.width` and `p.height` rather than hardcoded dimensions.
+- **Context Isolation:** Inside any `drawXxx` function (in scenes or renderers), ALWAYS wrap drawing logic in `p.push()` and `p.pop()` to prevent style leakage.
 - **Vector Math:** Use `p5.Vector` for positions.
-- **Loop:** Rely on the `main.ts` draw loop. Do not create secondary loops or intervals for rendering if possible.
 
 ## 3. Performance & Quality
-- **Preloading:** Use `p.preload()` in `main.ts` to load assets, then pass them to scenes if necessary, or use a global asset manager pattern.
-- **Responsiveness:** Ensure the canvas resizes correctly by handling `windowResized` in `main.ts`.
+- **Preloading:** Use `p.preload()` in `main.ts` to load assets.
+- **Responsiveness:** Critical for full-screen apps. `p.windowResized` MUST be implemented in `main.ts` to handle viewport changes gracefully.
 
 # Web API Usage
 - Since this runs in the browser, you are encouraged to use standard Web APIs (e.g., `localStorage` for high scores, `AudioContext`) alongside p5.js.

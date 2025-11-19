@@ -1,8 +1,9 @@
 import p5 from 'p5';
-import { CURRENT_SCENE } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
 import { drawIntro } from '@/scenes/intro';
 import { drawOutro } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
+import { drawGame } from '@/scenes/game';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -13,6 +14,12 @@ const main = (p5: p5) => {
 
     // 디버깅용 - START 씬으로 전환, 주석 해제하면 START 씬으로 전환
     // changeCurrentScene('START');
+    changeCurrentScene('GAME');
+  };
+  p5.windowResized = () => {
+    // 혹시라도 Browser 사이즈가 변경되면 이를 감지하여 Canvas 사이즈 조정
+    const { windowWidth, windowHeight } = p5;
+    p5.resizeCanvas(windowWidth, windowHeight);
   };
   p5.draw = () => {
     /*
@@ -52,7 +59,7 @@ const main = (p5: p5) => {
         console.log(CURRENT_SCENE);
         break;
       case 'GAME':
-        console.log(CURRENT_SCENE);
+        drawGame(p5);
         break;
       case 'SCORE':
         console.log(CURRENT_SCENE);
