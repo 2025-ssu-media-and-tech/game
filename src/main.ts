@@ -22,28 +22,6 @@ const main = (p5: p5) => {
     p5.resizeCanvas(windowWidth, windowHeight);
   };
   p5.draw = () => {
-    /*
-    뱀 렌더러 예시입니다.
-    const cellSize = 30;
-    const gridX = Math.floor(p5.width / 2 / cellSize);
-    const gridY = Math.floor(p5.height / 2 / cellSize);
-    */
-
-    /*
-    뱀 위치 (머리부터 꼬리까지)
-    const snakePositions: SnakePosition[] = [
-      { x: gridX * cellSize, y: gridY * cellSize },
-      { x: (gridX - 1) * cellSize, y: gridY * cellSize },
-      { x: (gridX - 2) * cellSize, y: gridY * cellSize },
-      { x: (gridX - 3) * cellSize, y: gridY * cellSize },
-    ];
-    */
-
-    /* 
-    뱀 그리기
-    drawSnake(p5, snakePositions, cellSize);
-    */
-
     // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
     switch (CURRENT_SCENE) {
       case 'INTRO':
@@ -75,12 +53,6 @@ const main = (p5: p5) => {
         console.log('잘못 된 Scene 값입니다.');
         return;
     }
-
-    // changeCurrentScene 예시.
-    // changeCurrentScene('READY', () => {
-    //   console.log('다음의 값으로 변경됨.', CURRENT_SCENE);
-    //   // 변경된 씬의 필요한 데이터(이미지, 오디오 등...) 로드.
-    // });
   };
 };
 
