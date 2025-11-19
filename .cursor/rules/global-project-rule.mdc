@@ -1,0 +1,108 @@
+---
+alwaysApply: true
+---
+
+# Project Context
+You are an expert Creative Coder and Front-end Developer specializing in `p5.js`, TypeScript, and Vite.
+Your task is to implement a Snake Game that runs in a browser environment using modern web standards.
+
+# Tech Stack
+- Runtime: Node.js
+- Build Tool: Vite
+- Library: p5.js (Instance Mode preferred)
+- Language: TypeScript
+- Environment: Browser (DOM API, Web Audio API, LocalStorage available)
+
+# Project Structure
+The project follows a strict directory structure. Analyze this tree before creating files:
+```
+- src
+  - assets           # Static assets (images, sounds)
+  - core             # Core game logic (Pure logic + Renderers)
+    - snake
+      snake-renderer.ts
+  - scenes           # Actual Draw Functions called inside p5.draw()
+    - intro
+      index.ts
+    - outro
+      index.ts
+  - types            # Shared TypeScript interfaces/types
+  - utils            # Helper functions & Global State (Scene management)
+  main.ts            # Entry point (p5 instance & Scene Orchestrator)
+  vite-env.d.ts
+```
+
+# Naming Conventions & File Management
+
+## Folder Naming Rule (CRITICAL)
+1. **General Rule:** When creating a NEW folder (outside of `core/`), if the folder contains **multiple files**, the name MUST be **Plural** (e.g., `utils`, `types`, `scenes`).
+2. **Exception:** The `core/` directory is exempt. Sub-folders can be singular (e.g., `core/snake`).
+3. **Single File Folders:** Allowed if it represents a specific entity (e.g., `scenes/intro`).
+
+## File Responsibilities
+- `main.ts`: The **ONLY** place where `new p5()` is instantiated. It acts as the **Orchestrator**, managing the main `setup`, `draw` loop, and switching between scenes.
+- `scenes/`: Contains files that export specific draw functions (e.g., `drawIntro`, `drawGame`). These functions are called within the `main.ts` draw loop.
+- `core/`: Contains pure logic and renderers (e.g., `SnakeRenderer`) that are also called by scenes or main loop.
+
+# p5.js Architecture & Coding Standards
+
+## 1. Instance Mode & Dependency Injection
+- **Architecture:** `main.ts` owns the `p5` instance. All other modules (scenes, renderers) must be **pure functions or classes** that receive the `p5` instance as an argument.
+- **Global State:** Use `utils` to manage global states like `CURRENT_SCENE`.
+
+### Example: main.ts (Orchestrator)
+```typescript
+import p5 from 'p5';
+import { CURRENT_SCENE } from '@/utils/scene';
+import { drawIntro } from '@/scenes/intro';
+
+const main = (p: p5) => {
+  p.setup = () => {
+    p.createCanvas(p.windowWidth, p.windowHeight);
+  };
+
+  p.draw = () => {
+    p.background(0);
+    
+    // Scene Switching Logic
+    switch (CURRENT_SCENE) {
+      case 'INTRO':
+        drawIntro(p); // Pass p5 instance
+        break;
+      case 'GAME':
+        // drawGame(p);
+        break;
+      default:
+        console.warn('Unknown Scene');
+    }
+  };
+};
+
+new p5(main);
+```
+
+### Example: scenes/intro/index.ts (Draw Function)
+```typescript
+import type p5 from 'p5';
+
+export const drawIntro = (p: p5) => {
+  // Always use push() and pop() to isolate styles
+  p.push();
+  p.fill(255);
+  p.textAlign(p.CENTER);
+  p.text('Intro Scene', p.width / 2, p.height / 2);
+  p.pop();
+};
+```
+
+## 2. Rendering Guidelines
+- **Context Isolation:** Inside any `drawXxx` function (in scenes or renderers), ALWAYS wrap drawing logic in `p.push()` and `p.pop()` to prevent style leakage (fill, stroke, transforms) to other scenes.
+- **Vector Math:** Use `p5.Vector` for positions.
+- **Loop:** Rely on the `main.ts` draw loop. Do not create secondary loops or intervals for rendering if possible.
+
+## 3. Performance & Quality
+- **Preloading:** Use `p.preload()` in `main.ts` to load assets, then pass them to scenes if necessary, or use a global asset manager pattern.
+- **Responsiveness:** Ensure the canvas resizes correctly by handling `windowResized` in `main.ts`.
+
+# Web API Usage
+- Since this runs in the browser, you are encouraged to use standard Web APIs (e.g., `localStorage` for high scores, `AudioContext`) alongside p5.js.
