@@ -1,4 +1,4 @@
-import type { SceneType } from './status';
+import type { SceneType } from '@/types/status';
 
 export type StartSceneButtonType = {
   x: number;

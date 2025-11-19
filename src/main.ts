@@ -2,7 +2,7 @@ import p5 from 'p5';
 import { CURRENT_SCENE } from '@/utils/scene';
 import { drawIntro } from '@/scenes/intro';
 import { drawOutro } from '@/scenes/outro';
-import { drawStart, handleStartClick } from './scenes/start';
+import { drawStart, handleStartClick } from '@/scenes/start';
 
 const main = (p5: p5) => {
   p5.setup = () => {

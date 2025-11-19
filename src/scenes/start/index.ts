@@ -17,7 +17,6 @@ let buttonsInitialized = false;
 export const drawStart = (p5: p5) => {
   if (CURRENT_SCENE !== sceneName) {
     changeCurrentScene(sceneName);
-    buttonsInitialized = false;
   }
 
   if (!buttonsInitialized || buttons.length === 0) {
