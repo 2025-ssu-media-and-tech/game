@@ -9,3 +9,13 @@ export const changeCurrentScene = (scene: SceneType, callback?: () => void) => {
     callback();
   }
 };
+
+export const isCurrentScene = (sceneName: SceneType) => {
+  return CURRENT_SCENE === sceneName;
+};
+
+export const ensureScene = (sceneName: SceneType, callback?: () => void) => {
+  if (!isCurrentScene(sceneName)) {
+    changeCurrentScene(sceneName, callback);
+  }
+};

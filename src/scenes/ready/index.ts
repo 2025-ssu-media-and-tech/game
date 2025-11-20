@@ -1,5 +1,5 @@
 import type p5 from 'p5';
-import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { getHighScore } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
@@ -28,9 +28,8 @@ const initScene = (p: p5) => {
 };
 
 export const drawReady = (p: p5) => {
-  if (CURRENT_SCENE !== sceneName) {
-    changeCurrentScene(sceneName);
-  }
+  // Scene 실행 보장.
+  ensureScene(sceneName);
 
   if (buttons.length === 0) {
     initScene(p);

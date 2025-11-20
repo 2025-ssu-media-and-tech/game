@@ -1,5 +1,5 @@
 import type p5 from 'p5';
-import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { drawSnake } from '@/core/snake/snake-renderer';
 import type { SnakePosition } from '@/types/snake';
@@ -104,7 +104,8 @@ const initGameOverUI = (p: p5) => {
 };
 
 export const drawGame = (p: p5) => {
-  if (CURRENT_SCENE !== sceneName) return;
+  // Scene 실행 보장.
+  ensureScene(sceneName);
 
   p.push();
 
