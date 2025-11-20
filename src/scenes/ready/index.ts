@@ -2,11 +2,11 @@ import type p5 from 'p5';
 import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { getHighScore } from '@/utils/storage';
-import { type SimpleButton, drawButton, isMouseOverButton } from '@/utils/ui';
+import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
 
 const sceneName: SceneType = 'READY';
 
-let buttons: SimpleButton[] = [];
+let buttons: Button[] = [];
 let highScore = 0;
 
 const initScene = (p: p5) => {
@@ -29,7 +29,7 @@ const initScene = (p: p5) => {
 
 export const drawReady = (p: p5) => {
   if (CURRENT_SCENE !== sceneName) {
-    changeCurrentScene('READY');
+    changeCurrentScene(sceneName);
   }
 
   if (buttons.length === 0) {
