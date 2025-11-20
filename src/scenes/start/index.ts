@@ -1,5 +1,5 @@
 import type p5 from 'p5';
-import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene.ts';
+import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene.ts';
 import type { SceneType } from '@/types/status.ts';
 import type { StartSceneButtonType } from '@/types/start';
 
@@ -15,9 +15,8 @@ let buttons: StartSceneButtonType[] = [];
 let buttonsInitialized = false;
 
 export const drawStart = (p5: p5) => {
-  if (CURRENT_SCENE !== sceneName) {
-    changeCurrentScene(sceneName);
-  }
+  // Scene 실행 보장.
+  ensureScene(sceneName);
 
   if (!buttonsInitialized || buttons.length === 0) {
     initButtons(p5);
