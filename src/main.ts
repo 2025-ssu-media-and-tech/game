@@ -1,8 +1,10 @@
 import p5 from 'p5';
-import { CURRENT_SCENE } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
 import { drawIntro } from '@/scenes/intro';
 import { drawOutro } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
+import { drawGame, handleGameClick } from '@/scenes/game';
+import { drawReady, handleReadyClick } from '@/scenes/ready';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -11,51 +13,53 @@ const main = (p5: p5) => {
     const canvas = p5.createCanvas(windowWidth, windowHeight);
     canvas.parent('app');
 
-    // 디버깅용 - START 씬으로 전환, 주석 해제하면 START 씬으로 전환
-    // changeCurrentScene('START');
+    changeCurrentScene('START');
   };
+
+  p5.windowResized = () => {
+    // 혹시라도 Browser 사이즈가 변경되면 이를 감지하여 Canvas 사이즈 조정
+    const { windowWidth, windowHeight } = p5;
+    p5.resizeCanvas(windowWidth, windowHeight);
+  };
+
+  // 마우스 클릭 감지 (Global)
+  p5.mousePressed = () => {
+    // 각 씬의 맞는 Click 핸들링 코드가 호출되어 실행될 수 있도록 작업.
+    switch (CURRENT_SCENE) {
+      case 'START':
+        handleStartClick(p5);
+        break;
+      case 'READY':
+        handleReadyClick(p5);
+        break;
+      case 'GAME':
+        handleGameClick(p5);
+        break;
+    }
+  };
+
   p5.draw = () => {
-    /*
-    뱀 렌더러 예시입니다.
-    const cellSize = 30;
-    const gridX = Math.floor(p5.width / 2 / cellSize);
-    const gridY = Math.floor(p5.height / 2 / cellSize);
-    */
-
-    /*
-    뱀 위치 (머리부터 꼬리까지)
-    const snakePositions: SnakePosition[] = [
-      { x: gridX * cellSize, y: gridY * cellSize },
-      { x: (gridX - 1) * cellSize, y: gridY * cellSize },
-      { x: (gridX - 2) * cellSize, y: gridY * cellSize },
-      { x: (gridX - 3) * cellSize, y: gridY * cellSize },
-    ];
-    */
-
-    /* 
-    뱀 그리기
-    drawSnake(p5, snakePositions, cellSize);
-    */
-
     // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
     switch (CURRENT_SCENE) {
       case 'INTRO':
         drawIntro(p5);
         break;
       case 'START':
-        p5.mousePressed = () => {
-          handleStartClick(p5);
-        };
         drawStart(p5);
         break;
       case 'READY':
-        console.log(CURRENT_SCENE);
+        drawReady(p5);
         break;
       case 'GAME':
-        console.log(CURRENT_SCENE);
+        drawGame(p5);
         break;
       case 'SCORE':
-        console.log(CURRENT_SCENE);
+        // TBD. 임시로 추가한 SCORE Scene, 제대로 작업해서 변경해야 함.
+        p5.background(0);
+        p5.fill(255);
+        p5.textAlign(p5.CENTER, p5.CENTER);
+        p5.textSize(32);
+        p5.text('Score Scene (To be implemented)', p5.width / 2, p5.height / 2);
         break;
       case 'END':
         console.log(CURRENT_SCENE);
@@ -68,12 +72,6 @@ const main = (p5: p5) => {
         console.log('잘못 된 Scene 값입니다.');
         return;
     }
-
-    // changeCurrentScene 예시.
-    // changeCurrentScene('READY', () => {
-    //   console.log('다음의 값으로 변경됨.', CURRENT_SCENE);
-    //   // 변경된 씬의 필요한 데이터(이미지, 오디오 등...) 로드.
-    // });
   };
 };
 
