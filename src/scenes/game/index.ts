@@ -4,7 +4,7 @@ import type { SceneType } from '@/types/status';
 import { drawSnake } from '@/core/snake/snake-renderer';
 import type { SnakePosition } from '@/types/snake';
 import type { Direction } from '@/types/direction';
-import { setHighScore } from '@/utils/storage';
+import { setHighScore, incrementAttemptCount, addScoreToHistory } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
 
 const sceneName: SceneType = 'GAME';
@@ -156,7 +156,9 @@ export const drawGame = (p: p5) => {
       const { cols, rows } = getGridSize(p);
       if (newHead.x < 0 || newHead.x >= cols || newHead.y < 0 || newHead.y >= rows) {
         isGameOver = true;
-        setHighScore(score); // 점수 저장
+        setHighScore(score); // 최고 점수 저장
+        incrementAttemptCount(); // 시도 횟수 증가
+        addScoreToHistory(score); // 점수 기록 저장
         initGameOverUI(p); // 게임오버 UI 렌더링
       } else {
         // 벽이 아닌 충돌을 감지했는데, 열매를 먹고있는 중 일수도 있으니 이를 판단하는 코드
@@ -168,7 +170,9 @@ export const drawGame = (p: p5) => {
 
         if (isSelfCollision) {
           isGameOver = true;
-          setHighScore(score); // 점수 저장
+          setHighScore(score); // 최고 점수 저장
+          incrementAttemptCount(); // 시도 횟수 증가
+          addScoreToHistory(score); // 점수 기록 저장
           initGameOverUI(p); // 게임오버 UI 렌더링
         } else {
           // 뱀 움직이기

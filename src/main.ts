@@ -5,6 +5,7 @@ import { drawOutro } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
 import { drawGame, handleGameClick } from '@/scenes/game';
 import { drawReady, handleReadyClick } from '@/scenes/ready';
+import { drawScore, handleScoreClick, handleScoreWheel } from '@/scenes/score';
 
 const main = (p5: p5) => {
   p5.setup = () => {
@@ -35,7 +36,20 @@ const main = (p5: p5) => {
       case 'GAME':
         handleGameClick(p5);
         break;
+      case 'SCORE':
+        handleScoreClick(p5);
+        break;
     }
+  };
+
+  // 마우스 휠 감지 (Global)
+  p5.mouseWheel = (event: { delta: number }) => {
+    switch (CURRENT_SCENE) {
+      case 'SCORE':
+        handleScoreWheel(p5, event);
+        break;
+    }
+    return false; // 기본 스크롤 동작 방지
   };
 
   p5.draw = () => {
@@ -54,12 +68,7 @@ const main = (p5: p5) => {
         drawGame(p5);
         break;
       case 'SCORE':
-        // TBD. 임시로 추가한 SCORE Scene, 제대로 작업해서 변경해야 함.
-        p5.background(0);
-        p5.fill(255);
-        p5.textAlign(p5.CENTER, p5.CENTER);
-        p5.textSize(32);
-        p5.text('Score Scene (To be implemented)', p5.width / 2, p5.height / 2);
+        drawScore(p5);
         break;
       case 'END':
         console.log(CURRENT_SCENE);
