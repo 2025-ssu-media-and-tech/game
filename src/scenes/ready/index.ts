@@ -3,6 +3,7 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { getHighScore } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
+import { initGame } from '../game';
 
 const sceneName: SceneType = 'READY';
 
@@ -13,27 +14,28 @@ const initScene = (p: p5) => {
   highScore = getHighScore();
 
   const centerX = p.width / 2;
-  const centerY = p.height / 2;
+  const bottomY = p.height - 80;
+
+  const isSmallScreen = p.width < 600;
+  const buttonWidth = isSmallScreen ? Math.min(180, p.width * 0.35) : 200;
+  const buttonHeight = isSmallScreen ? 45 : 50;
 
   buttons = [
     {
       id: 'start-game',
       x: centerX,
-      y: centerY + 100,
-      width: 200,
-      height: 50,
+      y: bottomY,
+      width: buttonWidth,
+      height: buttonHeight,
       text: '게임 시작',
     },
   ];
 };
 
 export const drawReady = (p: p5) => {
-  // Scene 실행 보장.
   ensureScene(sceneName);
 
-  if (buttons.length === 0) {
-    initScene(p);
-  }
+  initScene(p);
 
   p.push();
   p.background(0); // 화면 초기화
@@ -49,10 +51,9 @@ export const drawReady = (p: p5) => {
   if (highScore > 0) {
     p.textSize(24);
     p.fill('#4CAF50'); // Snake Green
-    p.text(`이전 최고 기록: ${highScore}`, p.width / 2, p.height / 2 + 10);
+    p.text(`이전 최고 기록 : ${highScore}점`, p.width / 2, p.height / 2 + 10);
   }
 
-  // 버튼 렌더링
   buttons.forEach((btn) => drawButton(p, btn));
 
   p.pop();
@@ -63,10 +64,12 @@ export const handleReadyClick = (p: p5) => {
 
   buttons.forEach((btn) => {
     if (isMouseOverButton(p, btn)) {
+      if (window.playClickSound) {
+        window.playClickSound();
+      }
       if (btn.id === 'start-game') {
-        // 버튼 초기화
         buttons = [];
-        // 'GAME' Scene으로 이동
+        initGame(p);
         changeCurrentScene('GAME');
       }
     }

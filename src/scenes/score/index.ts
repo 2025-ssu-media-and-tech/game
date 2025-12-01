@@ -3,7 +3,6 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { getAttemptCount, getScoreHistory, getHighScore } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
-import { initGame } from '../game';
 
 const sceneName: SceneType = 'SCORE';
 
@@ -100,6 +99,7 @@ export const drawScore = (p: p5) => {
   p.fill(255);
   p.textAlign(p.CENTER, p.CENTER);
   p.textSize(48);
+  p.textStyle(p.BOLD);
   p.text('SCORE BOARD', p.width / 2, 80);
 
   // 점수 정보
@@ -128,9 +128,11 @@ export const drawScore = (p: p5) => {
   // 현재 게임 점수
   if (scoreHistory.length > 0) {
     p.fill(200);
+    p.textStyle(p.BOLD);
     p.text('현재 게임 점수', 100, startY);
     p.fill(255);
     p.textAlign(p.RIGHT, p.TOP);
+    p.textStyle(p.BOLD);
     p.text(`${currentGameScore}점`, p.width - 100, startY);
     p.textAlign(p.LEFT, p.TOP);
     startY += 50;
@@ -147,6 +149,7 @@ export const drawScore = (p: p5) => {
 
   // 최고 점수
   p.fill(200);
+  p.textStyle(p.BOLD);
   p.text('최고 점수', 100, startY);
   p.fill(255);
   p.textAlign(p.RIGHT, p.TOP);
@@ -158,6 +161,7 @@ export const drawScore = (p: p5) => {
   if (scoreHistory.length > 0) {
     p.fill(200);
     p.textSize(20);
+    p.textStyle(p.BOLD);
     p.textAlign(p.CENTER, p.TOP);
     p.text('점수 기록', centerX, startY);
     startY += 40;
@@ -175,11 +179,15 @@ export const drawScore = (p: p5) => {
 
       // 순위
       p.fill(150);
+      p.textSize(20);
+      p.textStyle(p.BOLD);
       p.text(`#${i + 1}`, 100, y);
 
       // 점수
       p.fill(255);
       p.textAlign(p.RIGHT, p.TOP);
+      p.textSize(20);
+      p.textStyle(p.BOLD);
       p.text(`${score}점`, p.width - 100, y);
       p.textAlign(p.LEFT, p.TOP);
     }
@@ -196,11 +204,13 @@ export const handleScoreClick = (p: p5) => {
 
   scoreButtons.forEach((btn) => {
     if (isMouseOverButton(p, btn)) {
+      if (window.playClickSound) {
+        window.playClickSound();
+      }
       if (btn.id === 'back-to-start') {
         changeCurrentScene('START');
         scrollOffset = 0;
       } else if (btn.id === 'play-again') {
-        initGame(p);
         changeCurrentScene('READY');
         scrollOffset = 0;
       }
