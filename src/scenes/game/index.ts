@@ -13,11 +13,13 @@ const CELL_SIZE = 40;
 const BASE_MOVE_INTERVAL = 150; // 시작 속도를 조금 더 느리게 조정 (난이도가 어짜피 증가할 예정이라)
 const MIN_MOVE_INTERVAL = 40; // 최대 속도 제한
 const SPEED_STEP = 2; // 점수당 빨라지는 ms
+const WALL_SPAWN_SCORE_INTERVAL = 100; // 벽이 생성되는 점수 간격
 
 // 상태
 let snake: SnakePosition[] = [];
 let food: SnakePosition | null = null;
 let goldenFood: SnakePosition | null = null; // 황금 열매
+let walls: SnakePosition[] = []; // 장애물 (벽)
 let direction: Direction = 'right';
 let nextDirection: Direction = 'right';
 let lastMoveTime = 0;
@@ -64,13 +66,34 @@ const getMoveInterval = () => {
 };
 
 // 좌표가 유효하고 충돌하지 않는지 확인하는 헬퍼 함수
-const isValidSpawnPosition = (pos: SnakePosition, snakeBody: SnakePosition[], otherFood: SnakePosition | null) => {
+const isValidSpawnPosition = (
+  pos: SnakePosition,
+  snakeBody: SnakePosition[],
+  otherFood: SnakePosition | null,
+  existingWalls: SnakePosition[],
+  checkRespawnZone: boolean = false,
+  cols: number = 0,
+  rows: number = 0,
+) => {
   // 뱀 몸통과 충돌 체크
   const onSnake = snakeBody.some((segment) => segment.x === pos.x && segment.y === pos.y);
   // 다른 음식과 충돌 체크
   const onOtherFood = otherFood && otherFood.x === pos.x && otherFood.y === pos.y;
+  // 벽과 충돌 체크
+  const onWall = existingWalls.some((wall) => wall.x === pos.x && wall.y === pos.y);
 
-  return !onSnake && !onOtherFood;
+  // 리스폰 구역(중앙) 체크 (벽 생성 시 필수)
+  let onRespawnZone = false;
+  if (checkRespawnZone && cols > 0 && rows > 0) {
+    const startX = Math.floor(cols / 2);
+    const startY = Math.floor(rows / 2);
+    // 초기 뱀 길이(3) + 여유 공간 고려하여 중앙 근처에는 벽 생성 금지
+    if (Math.abs(pos.x - startX) <= 2 && Math.abs(pos.y - startY) <= 1) {
+      onRespawnZone = true;
+    }
+  }
+
+  return !onSnake && !onOtherFood && !onWall && !onRespawnZone;
 };
 
 // 열매(점수 획득 요소) 스폰 기능
@@ -88,7 +111,7 @@ const spawnFood = (p: p5) => {
       y: Math.floor(Math.random() * rows),
     };
 
-    if (isValidSpawnPosition(newFood, snake, goldenFood)) {
+    if (isValidSpawnPosition(newFood, snake, goldenFood, walls)) {
       valid = true;
     }
     attempts++;
@@ -117,7 +140,7 @@ const spawnGoldenFood = (p: p5) => {
       y: Math.floor(Math.random() * rows),
     };
 
-    if (isValidSpawnPosition(newFood, snake, food)) {
+    if (isValidSpawnPosition(newFood, snake, food, walls)) {
       valid = true;
     }
     attempts++;
@@ -125,6 +148,39 @@ const spawnGoldenFood = (p: p5) => {
 
   if (valid) {
     goldenFood = newFood;
+  }
+};
+
+// 벽(장애물) 스폰 기능
+const spawnWall = (p: p5) => {
+  const { cols, rows } = getGridSize(p);
+  let valid = false;
+  let newWall: SnakePosition = { x: 0, y: 0 };
+
+  let attempts = 0;
+  const maxAttempts = 100;
+
+  while (!valid && attempts < maxAttempts) {
+    newWall = {
+      x: Math.floor(Math.random() * cols),
+      y: Math.floor(Math.random() * rows),
+    };
+
+    // 벽 생성 시에는 리스폰 구역도 피해야 함
+    if (
+      isValidSpawnPosition(newWall, snake, food, walls, true, cols, rows) &&
+      (!goldenFood || goldenFood.x !== newWall.x || goldenFood.y !== newWall.y)
+    ) {
+      valid = true;
+    }
+    attempts++;
+  }
+
+  if (valid) {
+    walls.push(newWall);
+    // 벽 생성 시 효과
+    createExplosionParticles(p, newWall.x, newWall.y);
+    addFloatingText('New Wall!', p.width / 2, p.height / 2 - 50, '#9E9E9E');
   }
 };
 
@@ -247,6 +303,7 @@ export const initGame = (p: p5) => {
   isGameOver = false;
   particles = [];
   floatingTexts = [];
+  walls = []; // 벽 초기화
   goldenFood = null;
   spawnFood(p);
   lastMoveTime = p.millis();
@@ -262,7 +319,7 @@ const respawnSnake = (p: p5) => {
   const startX = Math.floor(cols / 2);
   const startY = Math.floor(rows / 2);
 
-  // 뱀 위치만 리셋 (점수, 속도 등은 유지)
+  // 뱀 위치만 리셋 (점수, 속도, 벽 등은 유지)
   snake = [
     { x: startX, y: startY },
     { x: startX - 1, y: startY },
@@ -393,11 +450,12 @@ export const drawGame = (p: p5) => {
         const isEating = food && newHead.x === food.x && newHead.y === food.y;
         const isEatingGolden = goldenFood && newHead.x === goldenFood.x && newHead.y === goldenFood.y;
 
-        // 충돌 감지 (몸)
+        // 충돌 감지 (몸 및 장애물 벽)
         const segmentsToCheck = isEating || isEatingGolden ? snake : snake.slice(0, -1);
         const isSelfCollision = segmentsToCheck.some((seg) => seg.x === newHead.x && seg.y === newHead.y);
+        const isWallCollision = walls.some((wall) => wall.x === newHead.x && wall.y === newHead.y);
 
-        if (isSelfCollision) {
+        if (isSelfCollision || isWallCollision) {
           collision = true;
         } else {
           // 뱀 움직이기
@@ -408,8 +466,9 @@ export const drawGame = (p: p5) => {
               window.playEatSound();
             }
 
-            // 점수 증가 전 스피드 레벨 계산
+            // 점수 증가 전 상태 저장 (스피드, 벽 생성용)
             const prevSpeedLevel = Math.floor(score / 50);
+            const prevWallLevel = Math.floor(score / WALL_SPAWN_SCORE_INTERVAL);
 
             score += 10;
             fruitCount += 1;
@@ -419,6 +478,12 @@ export const drawGame = (p: p5) => {
             const newSpeedLevel = Math.floor(score / 50);
             if (newSpeedLevel > prevSpeedLevel) {
               addFloatingText('Speed Up!', p.width / 2, p.height / 2, '#FF4081');
+            }
+
+            // 점수 증가 후 벽 생성 체크
+            const newWallLevel = Math.floor(score / WALL_SPAWN_SCORE_INTERVAL);
+            if (newWallLevel > prevWallLevel) {
+              spawnWall(p);
             }
 
             // 일반 열매 먹었을 때 15% 확률로 황금 열매 생성
@@ -431,8 +496,9 @@ export const drawGame = (p: p5) => {
               window.playEatSound(); // 필요시 다른 사운드로 변경 가능
             }
 
-            // 점수 증가 전 스피드 레벨 계산
+            // 점수 증가 전 상태 저장
             const prevSpeedLevel = Math.floor(score / 50);
+            const prevWallLevel = Math.floor(score / WALL_SPAWN_SCORE_INTERVAL);
 
             lives += 1; // 목숨 증가
             score += 50; // 보너스 점수
@@ -441,6 +507,12 @@ export const drawGame = (p: p5) => {
             const newSpeedLevel = Math.floor(score / 50);
             if (newSpeedLevel > prevSpeedLevel) {
               addFloatingText('Speed Up!', p.width / 2, p.height / 2, '#FF4081');
+            }
+
+            // 점수 증가 후 벽 생성 체크
+            const newWallLevel = Math.floor(score / WALL_SPAWN_SCORE_INTERVAL);
+            if (newWallLevel > prevWallLevel) {
+              spawnWall(p);
             }
 
             goldenFood = null; // 황금 열매 제거
@@ -478,6 +550,23 @@ export const drawGame = (p: p5) => {
   }
 
   // 렌더링
+
+  // 벽(장애물) 렌더링
+  p.push();
+  p.rectMode(p.CORNER);
+  p.fill('#9E9E9E'); // 회색
+  p.stroke(0);
+  p.strokeWeight(1);
+  walls.forEach((wall) => {
+    const wx = wall.x * CELL_SIZE;
+    const wy = wall.y * CELL_SIZE;
+    p.rect(wx, wy, CELL_SIZE, CELL_SIZE, 4);
+    // 벽 질감 표현 (X자)
+    p.line(wx, wy, wx + CELL_SIZE, wy + CELL_SIZE);
+    p.line(wx + CELL_SIZE, wy, wx, wy + CELL_SIZE);
+  });
+  p.pop();
+
   // 열매 렌더링
   if (food) {
     const fx = food.x * CELL_SIZE;
@@ -507,7 +596,7 @@ export const drawGame = (p: p5) => {
 
     // 빛나는 효과
     const glowSize = 5 + p.sin(p.millis() * 0.005) * 2;
-    p.fill(255, 215, 0, 100); // 황금 후광?.. 띠용띠용 그거..
+    p.fill(255, 215, 0, 100); // 황금 후광
     p.noStroke();
     p.ellipse(gfx + CELL_SIZE / 2, gfy + CELL_SIZE / 2, CELL_SIZE + glowSize);
 
@@ -666,7 +755,9 @@ export const drawGame = (p: p5) => {
   p.textSize(24);
   p.textStyle(p.BOLD);
   p.textAlign(p.LEFT, p.TOP);
-  p.text(`먹은 열매 : ${fruitCount}개`, 20, 20);
+
+  // 점수 및 먹은 열매 표시
+  p.text(`먹은 열매 : ${fruitCount}개   /   현재 점수 : ${score}점`, 20, 20);
 
   // 목숨 표시
   const heartSymbol = '❤️';
