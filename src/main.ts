@@ -16,7 +16,7 @@ import gameBackground1 from '@/assets/audio/background/game-background-1-321720.
 import grooveQuest from '@/assets/audio/background/groove-quest-288437.mp3';
 import pixelatedAdventure from '@/assets/audio/background/pixelated-adventure-hyperpop-music-122039.mp3';
 
-import type { p5Instance, P5Constructor } from './types/p5-global';
+import type { p5Instance, P5Constructor } from '@/types/p5-global';
 import type { SoundFile } from 'p5';
 
 const main = (p5: p5Instance) => {
