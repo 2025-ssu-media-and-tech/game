@@ -13,6 +13,7 @@ const SNAKE_THEME = {
 
 let buttons: StartSceneButtonType[] = [];
 let buttonsInitialized = false;
+let animationTime = 0;
 
 export const drawStart = (p5: p5) => {
   // Scene 실행 보장.
@@ -22,6 +23,9 @@ export const drawStart = (p5: p5) => {
     initButtons(p5);
     buttonsInitialized = true;
   }
+
+  // 애니메이션 시간 업데이트
+  animationTime += 0.02;
 
   p5.push();
 
@@ -37,16 +41,39 @@ export const drawStart = (p5: p5) => {
     p5.ellipse(p5.width / 2, p5.height / 2, size);
   }
 
-  p5.textAlign(p5.CENTER, p5.CENTER);
+  p5.textAlign(p5.LEFT, p5.CENTER);
   p5.textSize(64);
-  p5.fill(SNAKE_THEME.shadowLight);
   p5.textStyle(p5.BOLD);
-  p5.text('BAAAAAAAAAAM', p5.width / 2, p5.height / 2 - 120);
 
-  p5.fill(SNAKE_THEME.shadow);
-  p5.text('BAAAAAAAAAAM', p5.width / 2 + 3, p5.height / 2 - 117);
-  p5.fill(SNAKE_THEME.shadowLight);
-  p5.text('BAAAAAAAAAAM', p5.width / 2, p5.height / 2 - 120);
+  // 텍스트를 문자별로 그리기
+  const text = 'BAAAAAAAAAAM';
+  const baseY = p5.height / 2 - 120;
+  const baseX = p5.width / 2;
+
+  // 전체 텍스트 너비 계산
+  const totalWidth = p5.textWidth(text);
+  let currentX = baseX - totalWidth / 2;
+
+  // 각 문자를 개별적으로 그리기
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const charWidth = p5.textWidth(char);
+
+    // 각 문자마다 다른 애니메이션 오프셋 (위상 차이)
+    const charOffset = p5.sin(animationTime * 2 + i * 0.5) * 20;
+    const charY = baseY + charOffset;
+
+    // 그림자 효과
+    p5.fill(SNAKE_THEME.shadow);
+    p5.text(char, currentX + 3, charY + 3);
+
+    // 메인 텍스트
+    p5.fill(SNAKE_THEME.shadowLight);
+    p5.text(char, currentX, charY);
+
+    // 다음 문자 위치로 이동
+    currentX += charWidth;
+  }
 
   drawButtons(p5);
 
