@@ -58,7 +58,7 @@ const spawnFood = (p: p5) => {
   }
 };
 
-const initGame = (p: p5) => {
+export const initGame = (p: p5) => {
   const { cols, rows } = getGridSize(p);
   const startX = Math.floor(cols / 2);
   const startY = Math.floor(rows / 2);

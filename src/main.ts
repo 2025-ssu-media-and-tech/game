@@ -1,4 +1,5 @@
-import { CURRENT_SCENE, changeCurrentScene } from '@/utils/scene';
+import { CURRENT_SCENE, changeCurrentScene, setSceneChangeCallback, applySceneChange } from '@/utils/scene';
+import type { SceneType } from '@/types/status';
 import { drawIntro, handleIntroClick } from '@/scenes/intro';
 import { drawOutro } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
@@ -14,6 +15,26 @@ import type { SoundFile } from 'p5';
 const main = (p5: p5Instance) => {
   let sound: SoundFile;
   let soundStarted = false;
+
+  // Fade 애니메이션 상태
+  let fadeAlpha = 0;
+  let isFading = false;
+  let fadeDirection: 'in' | 'out' = 'out'; // 'out' = fade out, 'in' = fade in
+  const fadeSpeed = 0.05; // fade 속도 (조절 가능)
+  let pendingScene: SceneType | null = null; // 변경 예정인 씬
+  let displayScene: SceneType = CURRENT_SCENE; // 실제로 그려질 씬
+
+  // 씬 변경 감지 및 fade 시작
+  setSceneChangeCallback((from, to) => {
+    if (from !== null) {
+      // 씬 변경 요청 시 fade out 시작 (CURRENT_SCENE은 아직 변경하지 않음)
+      pendingScene = to;
+      displayScene = from; // fade out 중에는 이전 씬을 계속 표시
+      isFading = true;
+      fadeDirection = 'out';
+      fadeAlpha = 0;
+    }
+  });
 
   const startAudio = () => {
     if (soundStarted || !sound || !sound.isLoaded()) return;
@@ -40,6 +61,7 @@ const main = (p5: p5Instance) => {
     const canvas = p5.createCanvas(windowWidth, windowHeight);
     canvas.parent('app');
     changeCurrentScene('INTRO');
+    displayScene = 'INTRO'; // 초기 씬 설정
   };
 
   p5.windowResized = () => {
@@ -49,6 +71,9 @@ const main = (p5: p5Instance) => {
   };
 
   p5.mousePressed = () => {
+    // fade 중에는 클릭 무시
+    if (isFading) return;
+
     // 각 씬의 맞는 Click 핸들링 코드가 호출되어 실행될 수 있도록 작업.
     switch (CURRENT_SCENE) {
       case 'INTRO':
@@ -80,8 +105,33 @@ const main = (p5: p5Instance) => {
   };
 
   p5.draw = () => {
+    // Fade 애니메이션 업데이트
+    if (isFading) {
+      if (fadeDirection === 'out') {
+        fadeAlpha += fadeSpeed;
+        if (fadeAlpha >= 1) {
+          fadeAlpha = 1;
+          // fade out 완료 후 씬 변경
+          if (pendingScene !== null) {
+            applySceneChange(pendingScene); // CURRENT_SCENE 실제 변경
+            displayScene = pendingScene; // 표시 씬도 변경
+            pendingScene = null;
+            fadeDirection = 'in'; // fade in 시작
+          }
+        }
+      } else {
+        // fade in
+        fadeAlpha -= fadeSpeed;
+        if (fadeAlpha <= 0) {
+          fadeAlpha = 0;
+          isFading = false; // fade 완료
+        }
+      }
+    }
+
     // 각 씬의 맞는 draw 코드가 호출되어 실행될 수 있도록 작업.
-    switch (CURRENT_SCENE) {
+    // fade out 중에는 이전 씬을, fade in 중에는 새 씬을 표시
+    switch (displayScene) {
       case 'INTRO':
         drawIntro(p5);
         break;
@@ -107,6 +157,16 @@ const main = (p5: p5Instance) => {
         // no-op, 여기까지 코드가 도달할 일은 없습니다.
         console.log('잘못 된 Scene 값입니다.');
         return;
+    }
+
+    // Fade 오버레이
+    if (fadeAlpha > 0) {
+      p5.push();
+      p5.fill(0, fadeAlpha * 255);
+      p5.rectMode(p5.CORNER);
+      p5.noStroke();
+      p5.rect(0, 0, p5.width, p5.height);
+      p5.pop();
     }
   };
 };
