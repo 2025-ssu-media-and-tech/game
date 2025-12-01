@@ -3,6 +3,8 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene.ts
 import type { SceneType } from '@/types/status.ts';
 import type { StartSceneButtonType } from '@/types/start';
 
+const SPACING = 125;
+
 const sceneName: SceneType = 'START';
 
 const SNAKE_THEME = {
@@ -99,7 +101,7 @@ const initButtons = (p5: p5) => {
   const buttonHeight = 60;
   const buttonSpacing = 30;
   const centerX = p5.width / 2;
-  const centerY = p5.height / 2 + 40;
+  const centerY = p5.height / 2 + SPACING;
 
   buttons = [
     {
@@ -110,14 +112,14 @@ const initButtons = (p5: p5) => {
       text: '준비하세요',
       targetScene: 'READY',
     },
-    {
-      x: centerX,
-      y: centerY + buttonHeight / 2 + buttonSpacing / 2,
-      width: buttonWidth,
-      height: buttonHeight,
-      text: '인트로',
-      targetScene: 'INTRO',
-    },
+    // {
+    //   x: centerX,
+    //   y: centerY + buttonHeight / 2 + buttonSpacing / 2,
+    //   width: buttonWidth,
+    //   height: buttonHeight,
+    //   text: '인트로',
+    //   targetScene: 'INTRO',
+    // },
   ];
 };
 

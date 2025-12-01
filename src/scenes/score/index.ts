@@ -3,6 +3,7 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { getAttemptCount, getScoreHistory, getHighScore } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
+import { initGame } from '../game';
 
 const sceneName: SceneType = 'SCORE';
 
@@ -42,7 +43,7 @@ const initScoreUI = (p: p5) => {
       y: bottomY,
       width: buttonWidth,
       height: buttonHeight,
-      text: '다시하기',
+      text: '다시 시작',
     },
   ];
 };
@@ -199,7 +200,8 @@ export const handleScoreClick = (p: p5) => {
         changeCurrentScene('START');
         scrollOffset = 0;
       } else if (btn.id === 'play-again') {
-        changeCurrentScene('GAME');
+        initGame(p);
+        changeCurrentScene('READY');
         scrollOffset = 0;
       }
     }
