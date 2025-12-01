@@ -6,6 +6,8 @@ declare module 'p5' {
   export interface SoundFile {
     isLoaded(): boolean;
     loop(): void;
+    play(): void;
+    stop(): void;
     userStartAudio(): void;
     setVolume(volume: number): void;
     isPlaying(): boolean;
@@ -31,6 +33,11 @@ declare global {
 
   interface Window {
     startAudio?: () => void;
+    playClickSound?: () => void;
+    playOutSound?: () => void;
+    playEatSound?: () => void;
+    stopGameBgm?: () => void;
+    startGameBgm?: () => void;
   }
 }
 

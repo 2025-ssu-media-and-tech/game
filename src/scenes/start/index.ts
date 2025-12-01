@@ -3,8 +3,6 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene.ts
 import type { SceneType } from '@/types/status.ts';
 import type { StartSceneButtonType } from '@/types/start';
 
-const SPACING = 125;
-
 const sceneName: SceneType = 'START';
 
 const SNAKE_THEME = {
@@ -14,17 +12,12 @@ const SNAKE_THEME = {
 };
 
 let buttons: StartSceneButtonType[] = [];
-let buttonsInitialized = false;
 let animationTime = 0;
 
 export const drawStart = (p5: p5) => {
-  // Scene 실행 보장.
   ensureScene(sceneName);
 
-  if (!buttonsInitialized || buttons.length === 0) {
-    initButtons(p5);
-    buttonsInitialized = true;
-  }
+  initButtons(p5);
 
   // 애니메이션 시간 업데이트
   animationTime += 0.02;
@@ -95,31 +88,23 @@ export const drawStart = (p5: p5) => {
   p5.pop();
 };
 
-// 버튼 초기화
 const initButtons = (p5: p5) => {
-  const buttonWidth = 300;
-  const buttonHeight = 60;
-  const buttonSpacing = 30;
   const centerX = p5.width / 2;
-  const centerY = p5.height / 2 + SPACING;
+  const bottomY = p5.height - 80;
+
+  const isSmallScreen = p5.width < 600;
+  const buttonWidth = isSmallScreen ? Math.min(180, p5.width * 0.35) : 200;
+  const buttonHeight = isSmallScreen ? 45 : 50;
 
   buttons = [
     {
       x: centerX,
-      y: centerY - buttonHeight / 2 - buttonSpacing / 2,
+      y: bottomY,
       width: buttonWidth,
       height: buttonHeight,
       text: '준비하세요',
       targetScene: 'READY',
     },
-    // {
-    //   x: centerX,
-    //   y: centerY + buttonHeight / 2 + buttonSpacing / 2,
-    //   width: buttonWidth,
-    //   height: buttonHeight,
-    //   text: '인트로',
-    //   targetScene: 'INTRO',
-    // },
   ];
 };
 
@@ -156,6 +141,9 @@ export const handleStartClick = (p5: p5) => {
 
   buttons.forEach((button) => {
     if (isMouseOverButton(p5, button)) {
+      if (window.playClickSound) {
+        window.playClickSound();
+      }
       changeCurrentScene(button.targetScene);
     }
   });
