@@ -38,7 +38,7 @@ declare global {
     playEatSound?: () => void;
     stopGameBgm?: () => void;
     startGameBgm?: () => void;
-}
+  }
 }
 
 export type { p5Instance, P5Constructor };
