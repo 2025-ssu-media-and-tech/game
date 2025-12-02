@@ -1,7 +1,6 @@
 import { CURRENT_SCENE, changeCurrentScene, setSceneChangeCallback, applySceneChange } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { drawIntro, handleIntroClick } from '@/scenes/intro';
-import { drawSetting, handleSettingClick } from '@/scenes/setting';
 import { drawOutro } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
 import { drawGame, handleGameClick } from '@/scenes/game';
@@ -192,9 +191,6 @@ const main = (p5: p5Instance) => {
       case 'INTRO':
         handleIntroClick(p5);
         break;
-      case 'SETTING':
-        handleSettingClick();
-        break;
       case 'START':
         handleStartClick(p5);
         break;
@@ -279,9 +275,6 @@ const main = (p5: p5Instance) => {
     switch (displayScene) {
       case 'INTRO':
         drawIntro(p5);
-        break;
-      case 'SETTING':
-        drawSetting(p5);
         break;
       case 'START':
         drawStart(p5);

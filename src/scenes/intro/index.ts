@@ -428,7 +428,12 @@ export const handleIntroClick = (p: p5) => {
         window.playClickSound();
       }
       if (btn.id === 'play-now') {
-        changeCurrentScene('SETTING');
+        setTimeout(() => {
+          if (window.startAudio) {
+            window.startAudio();
+          }
+        }, 600);
+        changeCurrentScene('START');
       }
     }
   });

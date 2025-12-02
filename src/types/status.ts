@@ -1,4 +1,4 @@
-export const SCENES = ['INTRO', 'SETTING', 'START', 'READY', 'GAME', 'SCORE', 'END', 'OUTRO'] as const;
+export const SCENES = ['INTRO', 'START', 'READY', 'GAME', 'SCORE', 'END', 'OUTRO'] as const;
 export type SceneType = (typeof SCENES)[number];
 
 // 현재로서는 각 씬의 이름만 구별할 수 있으면 될 것 같은데,
