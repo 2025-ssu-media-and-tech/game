@@ -6,6 +6,7 @@ import type { SnakePosition } from '@/types/snake';
 import type { Direction } from '@/types/direction';
 import { setHighScore, incrementAttemptCount, addScoreToHistory } from '@/utils/storage';
 import { type Button, drawButton, isMouseOverButton } from '@/utils/ui';
+import { getRandomMap, drawMapBackground, drawMapDecorations, type MapType } from '@/core/map/map-renderer';
 
 const sceneName: SceneType = 'GAME';
 
@@ -27,6 +28,7 @@ let isGameOver = false;
 let score = 0;
 let fruitCount = 0;
 let lives = 2; // 목숨
+let currentMap: MapType = 'maze'; // 현재 맵
 
 // 버튼
 let gameOverButtons: Button[] = [];
@@ -288,6 +290,10 @@ export const initGame = (p: p5) => {
   const startX = Math.floor(cols / 2);
   const startY = Math.floor(rows / 2);
 
+  // 랜덤 맵 선택 (배경만 제공, 벽은 생성하지 않음)
+  currentMap = getRandomMap();
+  walls = []; // 벽 초기화 (기존 랜덤 생성 로직으로 생성됨)
+
   // 뱀 초기화 (시작할때 사이즈는 머리 포함 3개의 Cell)
   snake = [
     { x: startX, y: startY },
@@ -303,7 +309,6 @@ export const initGame = (p: p5) => {
   isGameOver = false;
   particles = [];
   floatingTexts = [];
-  walls = []; // 벽 초기화
   goldenFood = null;
   spawnFood(p);
   lastMoveTime = p.millis();
@@ -391,11 +396,14 @@ export const drawGame = (p: p5) => {
 
   p.push();
 
-  p.background(0);
-
   if (snake.length === 0) {
     initGame(p);
   }
+
+  // 맵 배경 및 장식물 렌더링
+  const { cols, rows } = getGridSize(p);
+  drawMapBackground(p, currentMap, CELL_SIZE, cols, rows);
+  drawMapDecorations(p, currentMap, CELL_SIZE, cols, rows);
 
   // 사용자 입력 핸들링
   if (p.keyIsDown(p.UP_ARROW) && direction !== 'down') {
