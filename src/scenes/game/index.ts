@@ -27,6 +27,7 @@ let lastMoveTime = 0;
 let isGameOver = false;
 let score = 0;
 let fruitCount = 0;
+let goldenFoodCount = 0; // 황금 열매 카운트
 let lives = 2; // 목숨
 let currentMap: MapType = 'maze'; // 현재 맵
 
@@ -305,6 +306,7 @@ export const initGame = (p: p5) => {
   nextDirection = 'right';
   score = 0;
   fruitCount = 0;
+  goldenFoodCount = 0;
   lives = 2; // 목숨 2개로 시작
   isGameOver = false;
   particles = [];
@@ -510,6 +512,7 @@ export const drawGame = (p: p5) => {
 
             lives += 1; // 목숨 증가
             score += 50; // 보너스 점수
+            goldenFoodCount += 1; // 황금 열매 카운트 증가
 
             // 점수 증가 후 스피드 레벨 계산 및 Speed Up 표시
             const newSpeedLevel = Math.floor(score / 50);
@@ -581,16 +584,22 @@ export const drawGame = (p: p5) => {
     const fy = food.y * CELL_SIZE;
     p.push();
     p.rectMode(p.CORNER);
+    p.imageMode(p.CORNER);
 
-    p.fill(0, 0, 0, 50);
-    p.noStroke();
-    p.rect(fx + 4, fy + 4, CELL_SIZE - 8, CELL_SIZE - 8, 8);
+    if (window.lowAppleImage) {
+      p.image(window.lowAppleImage, fx, fy, CELL_SIZE, CELL_SIZE);
+    } else {
+      // 이미지가 로드되지 않은 경우 fallback
+      p.fill(0, 0, 0, 50);
+      p.noStroke();
+      p.rect(fx + 4, fy + 4, CELL_SIZE - 8, CELL_SIZE - 8, 8);
 
-    p.fill('#FF5252');
-    p.rect(fx + 2, fy + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
+      p.fill('#FF5252');
+      p.rect(fx + 2, fy + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
 
-    p.fill(255, 255, 255, 150);
-    p.ellipse(fx + CELL_SIZE * 0.3, fy + CELL_SIZE * 0.3, CELL_SIZE * 0.15);
+      p.fill(255, 255, 255, 150);
+      p.ellipse(fx + CELL_SIZE * 0.3, fy + CELL_SIZE * 0.3, CELL_SIZE * 0.15);
+    }
 
     p.pop();
   }
@@ -601,6 +610,7 @@ export const drawGame = (p: p5) => {
     const gfy = goldenFood.y * CELL_SIZE;
     p.push();
     p.rectMode(p.CORNER);
+    p.imageMode(p.CORNER);
 
     // 빛나는 효과
     const glowSize = 5 + p.sin(p.millis() * 0.005) * 2;
@@ -608,14 +618,19 @@ export const drawGame = (p: p5) => {
     p.noStroke();
     p.ellipse(gfx + CELL_SIZE / 2, gfy + CELL_SIZE / 2, CELL_SIZE + glowSize);
 
-    p.fill(0, 0, 0, 50);
-    p.rect(gfx + 4, gfy + 4, CELL_SIZE - 8, CELL_SIZE - 8, 8);
+    if (window.highAppleImage) {
+      p.image(window.highAppleImage, gfx, gfy, CELL_SIZE, CELL_SIZE);
+    } else {
+      // 이미지가 로드되지 않은 경우 fallback
+      p.fill(0, 0, 0, 50);
+      p.rect(gfx + 4, gfy + 4, CELL_SIZE - 8, CELL_SIZE - 8, 8);
 
-    p.fill('#FFD700'); // 황금 색
-    p.rect(gfx + 2, gfy + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
+      p.fill('#FFD700'); // 황금 색
+      p.rect(gfx + 2, gfy + 2, CELL_SIZE - 4, CELL_SIZE - 4, 8);
 
-    p.fill(255, 255, 255, 200);
-    p.ellipse(gfx + CELL_SIZE * 0.3, gfy + CELL_SIZE * 0.3, CELL_SIZE * 0.15);
+      p.fill(255, 255, 255, 200);
+      p.ellipse(gfx + CELL_SIZE * 0.3, gfy + CELL_SIZE * 0.3, CELL_SIZE * 0.15);
+    }
 
     p.pop();
   }
@@ -746,9 +761,40 @@ export const drawGame = (p: p5) => {
     p.textStyle(p.BOLD);
     p.text('GAME OVER', p.width / 2, p.height / 2 - 50);
 
+    // 점수 아이콘 및 텍스트 표시
+    p.push();
     p.textSize(30);
     p.textStyle(p.BOLD);
-    p.text(`점수 : ${score}점`, p.width / 2, p.height / 2 + 10);
+    p.textAlign(p.LEFT, p.BASELINE);
+    p.imageMode(p.CORNER);
+
+    const scoreBaseY = p.height / 2 + 10;
+    const scoreIconSize = 30;
+    const scoreTextStr = `${score}점`;
+
+    // 텍스트 높이 계산
+    const scoreTextAscent = p.textAscent();
+    const scoreTextDescent = p.textDescent();
+    const scoreTextHeight = scoreTextAscent + scoreTextDescent;
+    const scoreTextCenterY = scoreBaseY + scoreTextHeight / 2;
+
+    // 아이콘을 텍스트 중앙에 맞추기
+    const scoreIconY = scoreTextCenterY - scoreIconSize / 2 - 2;
+    const scoreTextBaselineY = scoreBaseY + scoreTextAscent;
+
+    const scoreTextWidth = p.textWidth(scoreTextStr);
+    const scoreTotalWidth = scoreIconSize + 8 + scoreTextWidth;
+    const scoreStartX = p.width / 2 - scoreTotalWidth / 2;
+
+    if (window.scoreImage) {
+      p.image(window.scoreImage, scoreStartX, scoreIconY, scoreIconSize, scoreIconSize);
+      p.text(scoreTextStr, scoreStartX + scoreIconSize + 8, scoreTextBaselineY);
+    } else {
+      // 이미지가 로드되지 않은 경우 fallback
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text(`점수 : ${score}점`, p.width / 2, scoreBaseY);
+    }
+    p.pop();
 
     initGameOverUI(p);
     gameOverButtons.forEach((btn) => drawButton(p, btn));
@@ -762,10 +808,53 @@ export const drawGame = (p: p5) => {
   p.noStroke();
   p.textSize(24);
   p.textStyle(p.BOLD);
-  p.textAlign(p.LEFT, p.TOP);
+  p.textAlign(p.LEFT, p.BASELINE);
+  p.imageMode(p.CORNER);
 
-  // 점수 및 먹은 열매 표시
-  p.text(`먹은 열매 : ${fruitCount}개   /   현재 점수 : ${score}점`, 20, 20);
+  // 먹은 열매 아이콘 및 개수 표시
+  const baseY = 20; // 기준 Y 위치
+  const iconSize = 24;
+  let currentX = 20;
+
+  // 텍스트 높이 계산
+  const textAscent = p.textAscent();
+  const textDescent = p.textDescent();
+  const textHeight = textAscent + textDescent;
+  const textCenterY = baseY + textHeight / 2; // 텍스트 중앙 Y 좌표
+
+  // 아이콘을 텍스트 중앙에 맞추기 (약간 위로 조정)
+  const iconY = textCenterY - iconSize / 2 - 2; // 아이콘 상단 Y 좌표
+  const textBaselineY = baseY + textAscent; // 텍스트 베이스라인 Y 좌표
+
+  // 일반 열매 아이콘 및 개수
+  if (window.lowAppleImage) {
+    p.image(window.lowAppleImage, currentX, iconY, iconSize, iconSize);
+    currentX += iconSize + 8; // 아이콘과 텍스트 사이 간격
+    p.text(`x ${fruitCount}`, currentX, textBaselineY);
+    currentX += 80; // 다음 요소와의 간격
+  } else {
+    // 이미지가 로드되지 않은 경우 fallback
+    p.text(`먹은 열매 : ${fruitCount}개`, currentX, textBaselineY);
+    currentX += 200;
+  }
+
+  // 황금 열매 아이콘 및 개수
+  if (window.highAppleImage) {
+    p.image(window.highAppleImage, currentX, iconY, iconSize, iconSize);
+    currentX += iconSize + 8; // 아이콘과 텍스트 사이 간격
+    p.text(`x ${goldenFoodCount}`, currentX, textBaselineY);
+    currentX += 80; // 다음 요소와의 간격
+  }
+
+  // 현재 점수 표시
+  if (window.scoreImage) {
+    p.image(window.scoreImage, currentX, iconY, iconSize, iconSize);
+    currentX += iconSize + 8; // 아이콘과 텍스트 사이 간격
+    p.text(`${score}점`, currentX, textBaselineY);
+  } else {
+    // 이미지가 로드되지 않은 경우 fallback
+    p.text(`/   현재 점수 : ${score}점`, currentX, textBaselineY);
+  }
 
   // 목숨 표시
   const heartSymbol = '❤️';
@@ -773,7 +862,7 @@ export const drawGame = (p: p5) => {
   for (let i = 0; i < lives; i++) {
     livesText += heartSymbol + ' ';
   }
-  p.text(`목숨 : ${livesText}`, 20, 50);
+  p.text(`${livesText}`, 20, 85);
 
   p.pop();
 

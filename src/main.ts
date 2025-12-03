@@ -15,9 +15,13 @@ import battleBgm from '@/assets/audio/background/battlebgm-16bitfeelingsounds-38
 import gameBackground1 from '@/assets/audio/background/game-background-1-321720.mp3';
 import grooveQuest from '@/assets/audio/background/groove-quest-288437.mp3';
 import pixelatedAdventure from '@/assets/audio/background/pixelated-adventure-hyperpop-music-122039.mp3';
+import lowAppleImg from '@/assets/game/low-apple.png';
+import highAppleImg from '@/assets/game/high-apple.png';
+import scoreImg from '@/assets/game/score.png';
+import highScoreImg from '@/assets/game/high-score.png';
 
 import type { p5Instance, P5Constructor } from '@/types/p5-global';
-import type { SoundFile } from 'p5';
+import type { SoundFile, Image } from 'p5';
 
 const main = (p5: p5Instance) => {
   let sound: SoundFile; // 인트로 배경 음악
@@ -27,6 +31,10 @@ const main = (p5: p5Instance) => {
   let gameBgm: SoundFile | null = null; // 게임 배경음악
   let soundStarted = false;
   let gameBgmStarted = false;
+  let lowAppleImage: Image | null = null; // 일반 열매 이미지
+  let highAppleImage: Image | null = null; // 황금 열매 이미지
+  let scoreImage: Image | null = null; // 점수 이미지
+  let highScoreImage: Image | null = null; // 최고 점수 이미지
 
   // Fade 애니메이션 상태
   let fadeAlpha = 0;
@@ -166,6 +174,10 @@ const main = (p5: p5Instance) => {
     eatSound = p5.loadSound(eatWav, () => {
       console.log('열매 먹기 효과음 로드 완료');
     });
+    lowAppleImage = p5.loadImage(lowAppleImg);
+    highAppleImage = p5.loadImage(highAppleImg);
+    scoreImage = p5.loadImage(scoreImg);
+    highScoreImage = p5.loadImage(highScoreImg);
   };
 
   p5.setup = () => {
@@ -174,6 +186,12 @@ const main = (p5: p5Instance) => {
     canvas.parent('app');
     changeCurrentScene('INTRO');
     displayScene = 'INTRO'; // 초기 씬 설정
+
+    // 이미지 할당 (preload 완료 후)
+    window.lowAppleImage = lowAppleImage;
+    window.highAppleImage = highAppleImage;
+    window.scoreImage = scoreImage;
+    window.highScoreImage = highScoreImage;
   };
 
   p5.windowResized = () => {
