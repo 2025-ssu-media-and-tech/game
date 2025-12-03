@@ -38,6 +38,11 @@ declare global {
     playEatSound?: () => void;
     stopGameBgm?: () => void;
     startGameBgm?: () => void;
+    lowAppleImage?: p5Type.Image | null;
+    highAppleImage?: p5Type.Image | null;
+    scoreImage?: p5Type.Image | null;
+    highScoreImage?: p5Type.Image | null;
+    mediaMbaLogoImage?: p5Type.Image | null;
   }
 }
 
