@@ -22,15 +22,14 @@ const initScoreUI = (p: p5) => {
   const buttonHeight = isSmallScreen ? 45 : 50;
   const buttonGap = isSmallScreen ? 20 : 30;
 
-  // 버튼이 2개이므로 중심을 화면 중앙 기준으로 계산했습니다.
-  const halfGap = buttonGap / 2;
-  const firstButtonCenterX = centerX - buttonWidth / 2 - halfGap;
-  const secondButtonCenterX = centerX + buttonWidth / 2 + halfGap;
+  // 버튼이 3개이므로 중심을 화면 중앙 기준으로 계산했습니다.
+  const totalButtonsWidth = buttonWidth * 3 + buttonGap * 2;
+  const startX = centerX - totalButtonsWidth / 2 + buttonWidth / 2;
 
   scoreButtons = [
     {
       id: 'back-to-start',
-      x: firstButtonCenterX,
+      x: startX,
       y: bottomY,
       width: buttonWidth,
       height: buttonHeight,
@@ -38,11 +37,19 @@ const initScoreUI = (p: p5) => {
     },
     {
       id: 'play-again',
-      x: secondButtonCenterX,
+      x: startX + buttonWidth + buttonGap,
       y: bottomY,
       width: buttonWidth,
       height: buttonHeight,
       text: '다시 시작',
+    },
+    {
+      id: 'end-game',
+      x: startX + (buttonWidth + buttonGap) * 2,
+      y: bottomY,
+      width: buttonWidth,
+      height: buttonHeight,
+      text: '게임 종료',
     },
   ];
 };
@@ -212,6 +219,9 @@ export const handleScoreClick = (p: p5) => {
         scrollOffset = 0;
       } else if (btn.id === 'play-again') {
         changeCurrentScene('READY');
+        scrollOffset = 0;
+      } else if (btn.id === 'end-game') {
+        changeCurrentScene('OUTRO');
         scrollOffset = 0;
       }
     }

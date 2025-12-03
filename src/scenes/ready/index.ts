@@ -49,9 +49,41 @@ export const drawReady = (p: p5) => {
 
   // 이전 최고 기록이 있다면 Show
   if (highScore > 0) {
+    p.push();
     p.textSize(24);
+    p.textStyle(p.BOLD);
     p.fill('#4CAF50'); // Snake Green
-    p.text(`이전 최고 기록 : ${highScore}점`, p.width / 2, p.height / 2 + 10);
+    p.textAlign(p.LEFT, p.BASELINE);
+    p.imageMode(p.CORNER);
+
+    const baseY = p.height / 2 + 10;
+    const iconSize = 24;
+    const textStr = `${highScore}점`;
+
+    // 텍스트 높이 계산
+    const textAscent = p.textAscent();
+    const textDescent = p.textDescent();
+    const textHeight = textAscent + textDescent;
+    const textCenterY = baseY + textHeight / 2; // 텍스트 중앙 Y 좌표
+
+    // 아이콘을 텍스트 중앙에 맞추기 (약간 위로 조정)
+    const iconY = textCenterY - iconSize / 2 - 2; // 아이콘 상단 Y 좌표
+    const textBaselineY = baseY + textAscent; // 텍스트 베이스라인 Y 좌표
+
+    const textWidth = p.textWidth(textStr);
+    const totalWidth = iconSize + 8 + textWidth; // 아이콘 + 간격 + 텍스트
+    const startX = p.width / 2 - totalWidth / 2; // 전체를 중앙에 맞추기 위한 시작 X
+
+    if (window.highScoreImage) {
+      p.image(window.highScoreImage, startX, iconY, iconSize, iconSize);
+      p.text(textStr, startX + iconSize + 8, textBaselineY);
+    } else {
+      // 이미지가 로드되지 않은 경우 fallback
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text(`이전 최고 기록 : ${highScore}점`, p.width / 2, baseY);
+    }
+
+    p.pop();
   }
 
   buttons.forEach((btn) => drawButton(p, btn));
