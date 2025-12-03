@@ -42,6 +42,7 @@ declare global {
     highAppleImage?: p5Type.Image | null;
     scoreImage?: p5Type.Image | null;
     highScoreImage?: p5Type.Image | null;
+    mediaMbaLogoImage?: p5Type.Image | null;
   }
 }
 

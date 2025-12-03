@@ -1,7 +1,7 @@
 import { CURRENT_SCENE, changeCurrentScene, setSceneChangeCallback, applySceneChange } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
 import { drawIntro, handleIntroClick } from '@/scenes/intro';
-import { drawOutro } from '@/scenes/outro';
+import { drawOutro, handleOutroClick } from '@/scenes/outro';
 import { drawStart, handleStartClick } from '@/scenes/start';
 import { drawGame, handleGameClick } from '@/scenes/game';
 import { drawReady, handleReadyClick } from '@/scenes/ready';
@@ -19,6 +19,7 @@ import lowAppleImg from '@/assets/game/low-apple.png';
 import highAppleImg from '@/assets/game/high-apple.png';
 import scoreImg from '@/assets/game/score.png';
 import highScoreImg from '@/assets/game/high-score.png';
+import mediaMbaLogo from '@/assets/branding/media_mba_logo.svg';
 
 import type { p5Instance, P5Constructor } from '@/types/p5-global';
 import type { SoundFile, Image } from 'p5';
@@ -35,6 +36,7 @@ const main = (p5: p5Instance) => {
   let highAppleImage: Image | null = null; // 황금 열매 이미지
   let scoreImage: Image | null = null; // 점수 이미지
   let highScoreImage: Image | null = null; // 최고 점수 이미지
+  let mediaMbaLogoImage: Image | null = null; // 미디어경영학과 로고 이미지
 
   // Fade 애니메이션 상태
   let fadeAlpha = 0;
@@ -178,6 +180,7 @@ const main = (p5: p5Instance) => {
     highAppleImage = p5.loadImage(highAppleImg);
     scoreImage = p5.loadImage(scoreImg);
     highScoreImage = p5.loadImage(highScoreImg);
+    mediaMbaLogoImage = p5.loadImage(mediaMbaLogo);
   };
 
   p5.setup = () => {
@@ -192,6 +195,7 @@ const main = (p5: p5Instance) => {
     window.highAppleImage = highAppleImage;
     window.scoreImage = scoreImage;
     window.highScoreImage = highScoreImage;
+    window.mediaMbaLogoImage = mediaMbaLogoImage;
   };
 
   p5.windowResized = () => {
@@ -220,6 +224,9 @@ const main = (p5: p5Instance) => {
         break;
       case 'SCORE':
         handleScoreClick(p5);
+        break;
+      case 'OUTRO':
+        handleOutroClick(p5);
         break;
     }
   };
