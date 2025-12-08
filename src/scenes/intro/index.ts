@@ -3,7 +3,7 @@ import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene.ts
 import type { SceneType } from '@/types/status.ts';
 import { type Button, isMouseOverButton } from '@/utils/ui';
 
-import mediaMbaLogo from '@/assets/branding/media_mba_logo.svg';
+import dmLogo from '@/assets/branding/dm_logo.png';
 
 const sceneName: SceneType = 'INTRO';
 
@@ -15,7 +15,7 @@ const SNAKE_THEME = {
 
 let buttons: Button[] = [];
 let animationTime = 0;
-let mediaMbaImg: p5.Image | null = null;
+let dmLogoImg: p5.Image | null = null;
 
 // 배경 파티클
 type Particle = {
@@ -104,8 +104,8 @@ export const drawIntro = (p5: p5) => {
     initParticles(p5); // 씬 변경 시 파티클 초기화
   }
 
-  if (!mediaMbaImg) {
-    mediaMbaImg = p5.loadImage(mediaMbaLogo);
+  if (!dmLogoImg) {
+    dmLogoImg = p5.loadImage(dmLogo);
   }
 
   // 파티클 초기화 (첫 실행 시)
@@ -213,10 +213,10 @@ export const drawIntro = (p5: p5) => {
   const logoMaxHeight = 60;
   const logoY = logoPadding + logoMaxHeight / 2;
 
-  // 미디어경영학과 로고 (오른쪽)
-  if (mediaMbaImg && mediaMbaImg.width > 0 && mediaMbaImg.height > 0) {
+  // DM 로고 (오른쪽)
+  if (dmLogoImg && dmLogoImg.width > 0 && dmLogoImg.height > 0) {
     p5.push();
-    const logoAspectRatio = mediaMbaImg.width / mediaMbaImg.height;
+    const logoAspectRatio = dmLogoImg.width / dmLogoImg.height;
     const logoWidth = logoMaxHeight * logoAspectRatio;
     const logoX = p5.width - logoPadding - logoWidth / 2;
 
@@ -230,7 +230,7 @@ export const drawIntro = (p5: p5) => {
     // 로고 그리기
     p5.imageMode(p5.CENTER);
     p5.noTint(); // tint 제거하여 원본 색상 유지
-    p5.image(mediaMbaImg, logoX, logoY, logoWidth, logoMaxHeight);
+    p5.image(dmLogoImg, logoX, logoY, logoWidth, logoMaxHeight);
     p5.pop();
   }
 
