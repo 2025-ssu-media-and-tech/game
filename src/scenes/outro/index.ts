@@ -1,17 +1,17 @@
 import type p5 from 'p5';
 import { CURRENT_SCENE, changeCurrentScene, ensureScene } from '@/utils/scene';
 import type { SceneType } from '@/types/status';
-import mediaMbaLogo from '@/assets/branding/media_mba_logo.svg';
+import dmLogo from '@/assets/branding/dm_logo.png';
 
 const sceneName: SceneType = 'OUTRO';
 
-let mediaMbaImg: p5.Image | null = null;
+let dmLogoImg: p5.Image | null = null;
 
 export const drawOutro = (p: p5) => {
   ensureScene(sceneName);
 
-  if (!mediaMbaImg) {
-    mediaMbaImg = p.loadImage(mediaMbaLogo);
+  if (!dmLogoImg) {
+    dmLogoImg = p.loadImage(dmLogo);
   }
 
   p.push();
@@ -22,10 +22,10 @@ export const drawOutro = (p: p5) => {
   const logoMaxHeight = 60;
   const logoY = logoPadding + logoMaxHeight / 2;
 
-  // 미디어경영학과 로고 (오른쪽)
-  if (mediaMbaImg && mediaMbaImg.width > 0 && mediaMbaImg.height > 0) {
+  // DM 로고 (오른쪽)
+  if (dmLogoImg && dmLogoImg.width > 0 && dmLogoImg.height > 0) {
     p.push();
-    const logoAspectRatio = mediaMbaImg.width / mediaMbaImg.height;
+    const logoAspectRatio = dmLogoImg.width / dmLogoImg.height;
     const logoWidth = logoMaxHeight * logoAspectRatio;
     const logoX = p.width - logoPadding - logoWidth / 2;
 
@@ -39,7 +39,7 @@ export const drawOutro = (p: p5) => {
     // 로고 그리기
     p.imageMode(p.CENTER);
     p.noTint(); // tint 제거하여 원본 색상 유지
-    p.image(mediaMbaImg, logoX, logoY, logoWidth, logoMaxHeight);
+    p.image(dmLogoImg, logoX, logoY, logoWidth, logoMaxHeight);
     p.pop();
   }
 
